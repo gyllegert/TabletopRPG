@@ -48,13 +48,13 @@
             this.captureBoxOrg.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.captureBoxOrg.Location = new System.Drawing.Point(12, 12);
             this.captureBoxOrg.Name = "captureBoxOrg";
-            this.captureBoxOrg.Size = new System.Drawing.Size(512, 384);
+            this.captureBoxOrg.Size = new System.Drawing.Size(640, 480);
             this.captureBoxOrg.TabIndex = 2;
             this.captureBoxOrg.TabStop = false;
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(1145, 28);
+            this.btnStart.Location = new System.Drawing.Point(1333, 23);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(75, 23);
             this.btnStart.TabIndex = 3;
@@ -65,16 +65,16 @@
             // captureBoxBlue
             // 
             this.captureBoxBlue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxBlue.Location = new System.Drawing.Point(542, 12);
+            this.captureBoxBlue.Location = new System.Drawing.Point(658, 12);
             this.captureBoxBlue.Name = "captureBoxBlue";
-            this.captureBoxBlue.Size = new System.Drawing.Size(512, 384);
+            this.captureBoxBlue.Size = new System.Drawing.Size(640, 480);
             this.captureBoxBlue.TabIndex = 4;
             this.captureBoxBlue.TabStop = false;
             // 
             // captureBoxMagenta
             // 
             this.captureBoxMagenta.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxMagenta.Location = new System.Drawing.Point(542, 443);
+            this.captureBoxMagenta.Location = new System.Drawing.Point(542, 514);
             this.captureBoxMagenta.Name = "captureBoxMagenta";
             this.captureBoxMagenta.Size = new System.Drawing.Size(512, 384);
             this.captureBoxMagenta.TabIndex = 5;
@@ -83,7 +83,7 @@
             // captureBoxGreen
             // 
             this.captureBoxGreen.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxGreen.Location = new System.Drawing.Point(12, 443);
+            this.captureBoxGreen.Location = new System.Drawing.Point(24, 514);
             this.captureBoxGreen.Name = "captureBoxGreen";
             this.captureBoxGreen.Size = new System.Drawing.Size(512, 384);
             this.captureBoxGreen.TabIndex = 6;
@@ -92,7 +92,7 @@
             // captureBoxTeal
             // 
             this.captureBoxTeal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxTeal.Location = new System.Drawing.Point(1072, 443);
+            this.captureBoxTeal.Location = new System.Drawing.Point(1072, 514);
             this.captureBoxTeal.Name = "captureBoxTeal";
             this.captureBoxTeal.Size = new System.Drawing.Size(512, 384);
             this.captureBoxTeal.TabIndex = 7;
@@ -100,7 +100,7 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(1132, 84);
+            this.richTextBox1.Location = new System.Drawing.Point(1322, 87);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(100, 96);
             this.richTextBox1.TabIndex = 8;
