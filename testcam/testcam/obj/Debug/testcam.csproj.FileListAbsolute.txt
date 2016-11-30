@@ -21,3 +21,26 @@ c:\users\kevin bejer\documents\visual studio 2015\Projects\testcam\testcam\obj\D
 c:\users\kevin bejer\documents\visual studio 2015\Projects\testcam\testcam\obj\Debug\testcam.csproj.GenerateResource.Cache
 c:\users\kevin bejer\documents\visual studio 2015\Projects\testcam\testcam\obj\Debug\testcam.exe
 c:\users\kevin bejer\documents\visual studio 2015\Projects\testcam\testcam\obj\Debug\testcam.pdb
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\testcam.exe.config
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.exe
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.pdb
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\cvextern.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\msvcp120.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\msvcr120.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\opencv_ffmpeg310_64.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\testcam.exe
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\testcam.pdb
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.DebuggerVisualizers.VS2015.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.UI.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.UI.GL.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.World.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Microsoft.VisualStudio.DebuggerVisualizers.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\ZedGraph.dll
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.UI.xml
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.UI.GL.xml
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Emgu.CV.World.xml
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\bin\Debug\Microsoft.VisualStudio.DebuggerVisualizers.xml
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.csprojResolveAssemblyReference.cache
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.CameraCapture.resources
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.Properties.Resources.resources
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.csproj.GenerateResource.Cache
