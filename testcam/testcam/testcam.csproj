@@ -58,6 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Battlemat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Battlemat.Designer.cs">
+      <DependentUpon>Battlemat.cs</DependentUpon>
+    </Compile>
     <Compile Include="CameraCapture.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +72,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Battlemat.resx">
+      <DependentUpon>Battlemat.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CameraCapture.resx">
       <DependentUpon>CameraCapture.cs</DependentUpon>
     </EmbeddedResource>
@@ -77,6 +86,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -104,6 +114,9 @@
     <Content Include="opencv_ffmpeg310_64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Blue.png" />
+    <None Include="Resources\GameBoardTemplateWgrid.png" />
+    <None Include="Resources\GameBoardTemplate.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

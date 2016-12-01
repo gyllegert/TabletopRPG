@@ -13,16 +13,15 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.Util;
 using Emgu.CV.Cvb;
-using System.Diagnostics;
 
 namespace testcam
 {
     public partial class CameraCapture : Form
     {
+        #region Decalaring global variables
+
         Capture capture = null;
         bool captureInProgress;
-
-        Stopwatch sw = Stopwatch.StartNew();
 
         Image<Hsv, Byte> ImgHsv;
         Image<Gray, Byte> ImgBlue;
@@ -33,9 +32,14 @@ namespace testcam
         Image<Rgb, byte> gridImg = null;
 
         GridArea[,] WebcamGrid = new GridArea[8, 8];
-        GridArea blueGrid = null;
-        GridArea tealGrid;
+        public static GridArea blueGrid = null;
+        public static GridArea tealGrid = null;
+        public static GridArea greenGrid = null;
 
+        public static int boxWidth;
+        public static int boxHeight;
+
+        #endregion
 
         public CameraCapture()
         {
@@ -55,7 +59,7 @@ namespace testcam
                 capture.SetCaptureProperty(CapProp.FrameWidth, 640);
                 capture.SetCaptureProperty(CapProp.FrameHeight, 480);
                 capture.SetCaptureProperty(CapProp.AutoExposure, 0);
-                //capture.SetCaptureProperty(CapProp.Exposure, 0.1);
+                capture.SetCaptureProperty(CapProp.WhiteBalanceBlueU, 4250);
             }
             catch (NullReferenceException excpt)
             {
@@ -94,8 +98,8 @@ namespace testcam
             CvInvoke.MedianBlur(ImgHsv, ImgHsv, 9);
 
             ImgBlue = FindRange(ImgHsv, 95, 105, 100, 255, 80, 255);
-            ImgGreen = FindRange(ImgHsv, 60, 80, 0, 255, 150, 255);
-            ImgTeal = FindRange(ImgHsv, 80, 90, 0, 255, 150, 255);
+            ImgGreen = FindRange(ImgHsv, 30, 50, 0, 255, 80, 255);
+            ImgTeal = FindRange(ImgHsv, 10, 25, 0, 255, 80, 255);
             ImgMagenta = FindRange(ImgHsv, 110, 130, 0, 255, 150, 255);
 
             int blobAreaMinSize = 500;
@@ -105,19 +109,25 @@ namespace testcam
             Rgb teal = new Rgb(0, 255, 255);
             Rgb white = new Rgb(255, 255, 225);
             Rgb black = new Rgb(0, 0, 0);
+            Rgb green = new Rgb(0, 255, 0);
 
             gridImg = CreateScreenGrid(ImgHsv, 8, 8, black);
 
             object[] objArr = FindGamePiece(ImgBlue, blue, blobAreaMinSize, blobAreaMaxSize, blueGrid);
+            object[] greenArr = FindGamePiece(ImgGreen, green, blobAreaMinSize, blobAreaMaxSize, greenGrid);
 
             Image<Rgb, byte> bluePieceImg = (Image<Rgb, byte>)objArr[0];
             blueGrid = (GridArea)objArr[1];
 
+            Image<Rgb, byte> greenPieceImg = (Image<Rgb, byte>)greenArr[0];
+            greenGrid = (GridArea)greenArr[1];
+
             gridImg = ColorGrid(gridImg, blueGrid, blue);
+            gridImg = ColorGrid(gridImg, greenGrid, green);
 
             captureBoxOrg.Image = ImageFrame;
             //captureBoxBlue.Image = FindBlobs(ImgBlue, 0, 0, 255, blobAreaMinSize);
-            captureBoxGreen.Image = FindBlobs(ImgGreen, blue, blobAreaMinSize);
+            captureBoxGreen.Image = greenPieceImg;
             captureBoxTeal.Image = FindBlobs(ImgTeal, teal, blobAreaMinSize);
             //captureBoxMagenta.Image = FindBlobs(ImgMagenta, 255, 0, 255, blobAreaMinSize);
 
@@ -242,8 +252,8 @@ namespace testcam
             }
 
             Point topLeft = boundingBox.Location;
-            int boxWidth = boundingBox.Width;
-            int boxHeight = boundingBox.Height;
+            boxWidth = boundingBox.Width;
+            boxHeight = boundingBox.Height;
 
             int gridWidth = boxWidth / numGridsX;
             int gridHeight = boxHeight / numGridsY;
@@ -259,7 +269,6 @@ namespace testcam
                     Point gridLocation = new Point(x, y);
 
                     WebcamGrid[x, y] = new GridArea(tempPoint, gridLocation, gridWidth, gridHeight, rgb);
-                    richTextBox1.AppendText("centerCoords for grid (" + x + ", " + y + ") is: " + "(" + WebcamGrid[x, y].centerCoords.X + " ," + WebcamGrid[x, y].centerCoords.Y + ")");
                     blobImg = ColorGrid(blobImg, WebcamGrid[x, y], rgb);
                     blobImg.Draw(WebcamGrid[x, y].getCenterRectangle(), rgb, 2);
                 }
@@ -326,5 +335,16 @@ namespace testcam
                 capture.Dispose();
         }
 
+        private void Start_Battlemat_Click(object sender, EventArgs e)
+        {
+            Battlemat bt = new Battlemat();
+            Screen[] screens = Screen.AllScreens;
+            Rectangle location = screens[1].Bounds;
+            bt.StartPosition = FormStartPosition.Manual;
+            bt.SetBounds(location.X, location.Y, 1024, 1024);
+            bt.Show();
+
+            
+        }
     }
 }

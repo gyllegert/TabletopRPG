@@ -48,8 +48,8 @@ namespace testcam
             this.topLeftCoords = topLeftCoords;
             this.gridLocation = gridLocation;
 
-            centerCoords.X = (width * (gridLocation.X + 2));
-            centerCoords.Y = (height * (gridLocation.Y + 1));
+            centerCoords.X = topLeftCoords.X + (width / 2);
+            centerCoords.Y = topLeftCoords.Y + (height / 2);
 
             this.width = width;
             this.height = height;

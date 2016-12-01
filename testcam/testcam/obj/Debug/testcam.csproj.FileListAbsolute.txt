@@ -44,3 +44,4 @@ C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\test
 C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.CameraCapture.resources
 C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.Properties.Resources.resources
 C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.csproj.GenerateResource.Cache
+C:\Users\Kevin Bejer\Documents\GitHub\TabletopRPG\testcam\testcam\obj\Debug\testcam.Battlemat.resources
