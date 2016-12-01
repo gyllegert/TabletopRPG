@@ -13,6 +13,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.Util;
 using Emgu.CV.Cvb;
+using System.Diagnostics;
 
 namespace testcam
 {
@@ -21,11 +22,20 @@ namespace testcam
         Capture capture = null;
         bool captureInProgress;
 
+        Stopwatch sw = Stopwatch.StartNew();
+
         Image<Hsv, Byte> ImgHsv;
         Image<Gray, Byte> ImgBlue;
         Image<Gray, Byte> ImgGreen;
         Image<Gray, Byte> ImgTeal;
         Image<Gray, Byte> ImgMagenta;
+
+        Image<Rgb, byte> gridImg = null;
+
+        GridArea[,] WebcamGrid = new GridArea[8, 8];
+        GridArea blueGrid = null;
+        GridArea tealGrid;
+
 
         public CameraCapture()
         {
@@ -91,16 +101,28 @@ namespace testcam
             int blobAreaMinSize = 500;
             int blobAreaMaxSize = 2000;
 
+            Rgb blue = new Rgb(0, 0, 255);
+            Rgb teal = new Rgb(0, 255, 255);
+            Rgb white = new Rgb(255, 255, 225);
+            Rgb black = new Rgb(0, 0, 0);
+
+            gridImg = CreateScreenGrid(ImgHsv, 8, 8, black);
+
+            object[] objArr = FindGamePiece(ImgBlue, blue, blobAreaMinSize, blobAreaMaxSize, blueGrid);
+
+            Image<Rgb, byte> bluePieceImg = (Image<Rgb, byte>)objArr[0];
+            blueGrid = (GridArea)objArr[1];
+
+            gridImg = ColorGrid(gridImg, blueGrid, blue);
+
             captureBoxOrg.Image = ImageFrame;
             //captureBoxBlue.Image = FindBlobs(ImgBlue, 0, 0, 255, blobAreaMinSize);
-            captureBoxGreen.Image = FindBlobs(ImgGreen, 0, 255, 0, blobAreaMinSize);
-            captureBoxTeal.Image = FindBlobs(ImgTeal, 0, 255, 255, blobAreaMinSize);
+            captureBoxGreen.Image = FindBlobs(ImgGreen, blue, blobAreaMinSize);
+            captureBoxTeal.Image = FindBlobs(ImgTeal, teal, blobAreaMinSize);
             //captureBoxMagenta.Image = FindBlobs(ImgMagenta, 255, 0, 255, blobAreaMinSize);
 
-            captureBoxMagenta.Image = FindGamePiece(ImgBlue, 0, 0, 255, blobAreaMinSize, blobAreaMaxSize);
-
-            captureBoxBlue.Image = CreateScreenGrid(ImgHsv, 8, 8);
-
+            captureBoxBlue.Image = gridImg;
+            captureBoxMagenta.Image = bluePieceImg;
         }
 
         public Image<Gray, byte> FindRange(Image<Hsv, byte> ImgHsv, int HMin, int HMax, int VMin, int VMax, int SMin, int SMax)
@@ -137,7 +159,7 @@ namespace testcam
 
         }
 
-        public Image<Rgb, byte> FindBlobs(Image<Gray, byte> imgGray, int r, int g, int b, int minBlobArea)
+        public Image<Rgb, byte> FindBlobs(Image<Gray, byte> imgGray, Rgb rgb, int minBlobArea)
         {
 
             CvBlobDetector detector = new CvBlobDetector();
@@ -146,7 +168,7 @@ namespace testcam
             uint numBlobsFound = detector.Detect(imgGray, resultingBlobs);
 
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
-            Rgb val = new Rgb(r, g, b);
+            Rgb val = rgb;
 
             foreach (CvBlob targetBlob in resultingBlobs.Values)
             {
@@ -159,17 +181,15 @@ namespace testcam
             return blobImg;
         }
 
-        public Image<Rgb, byte> FindGamePiece(Image<Gray, byte> imgGray, int r, int g, int b, int minBlobArea, int maxBlobArea)
+        public object[] FindGamePiece(Image<Gray, byte> imgGray, Rgb rgb, int minBlobArea, int maxBlobArea, GridArea closestGrid)
         {
-
-
             CvBlobDetector detector = new CvBlobDetector();
             CvBlobs resultingBlobs = new CvBlobs();
 
             uint numBlobsFound = detector.Detect(imgGray, resultingBlobs);
 
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
-            Rgb val = new Rgb(r, g, b);
+            Rgb val = rgb;
 
             Rectangle boundingBox = new Rectangle();
             Point centerCoords = new Point();
@@ -178,11 +198,9 @@ namespace testcam
             {
                 if (targetBlob.Area > minBlobArea && targetBlob.Area < maxBlobArea)
                 {
-                    
                     blobImg.Draw(targetBlob.BoundingBox, val, 1);
                     boundingBox = targetBlob.BoundingBox;
                     centerCoords = Point.Round(targetBlob.Centroid);
-
                 }
             }
 
@@ -194,13 +212,15 @@ namespace testcam
 
             blobImg.Draw(piece.getCenterRectangle(), val, 2);
 
+            closestGrid = piece.GetGrid(WebcamGrid);
 
-            return blobImg;
+            object[] objArr = new object[] { blobImg, closestGrid };
+
+            return objArr;
         }
 
-        public Image<Rgb, byte> CreateScreenGrid(Image<Hsv, byte> ImgHsv, int numGridsX, int numGridsY)
+        public Image<Rgb, byte> CreateScreenGrid(Image<Hsv, byte> ImgHsv, int numGridsX, int numGridsY, Rgb rgb)
         {
-
             Image<Gray, byte> imgGray = FindValue(ImgHsv, 200, 255);
 
             CvBlobDetector detector = new CvBlobDetector();
@@ -209,7 +229,6 @@ namespace testcam
             uint numBlobsFound = detector.Detect(imgGray, resultingBlobs);
 
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
-            Rgb val = new Rgb(255, 255, 255);
 
             Rectangle boundingBox = new Rectangle();
 
@@ -217,10 +236,9 @@ namespace testcam
             {
                 if (targetBlob.Area > 1000)
                 {
-                    blobImg.Draw(targetBlob.BoundingBox, val, 3);
+                    blobImg.Draw(targetBlob.BoundingBox, new Rgb(255, 255, 255), 3);
                     boundingBox = targetBlob.BoundingBox;
                 }
-               
             }
 
             Point topLeft = boundingBox.Location;
@@ -229,10 +247,6 @@ namespace testcam
 
             int gridWidth = boxWidth / numGridsX;
             int gridHeight = boxHeight / numGridsY;
-
-            GridArea[,] WebcamGrid = new GridArea[8, 8];
-
-            Rgb gridRGB = new Rgb(0, 0, 0);
 
             for (int y = 0; y < numGridsY; y++)
             {
@@ -244,12 +258,19 @@ namespace testcam
 
                     Point gridLocation = new Point(x, y);
 
-                    WebcamGrid[x, y] = new GridArea(tempPoint, gridLocation, gridWidth, gridHeight);
-                    blobImg.Draw(WebcamGrid[x, y].getRectangle(), gridRGB, 2);
+                    WebcamGrid[x, y] = new GridArea(tempPoint, gridLocation, gridWidth, gridHeight, rgb);
+                    richTextBox1.AppendText("centerCoords for grid (" + x + ", " + y + ") is: " + "(" + WebcamGrid[x, y].centerCoords.X + " ," + WebcamGrid[x, y].centerCoords.Y + ")");
+                    blobImg = ColorGrid(blobImg, WebcamGrid[x, y], rgb);
+                    blobImg.Draw(WebcamGrid[x, y].getCenterRectangle(), rgb, 2);
                 }
             }
-
             return blobImg;
+        }
+
+        public Image<Rgb, byte> ColorGrid(Image<Rgb, byte> imgRGB, GridArea grid, Rgb rgb)
+        {
+            imgRGB.Draw(grid.getRectangle(), rgb, 2);
+            return imgRGB;
         }
 
         public Image<Hsv, byte> FindColor(Image<Hsv, byte> ImgHsv, int HMin, int HMax, int saturation, int value)
