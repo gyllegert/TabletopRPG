@@ -31,34 +31,27 @@ namespace testcam
             WindowState = FormWindowState.Maximized;
             CreateScreenGrid(8, 8);
 
-            while (true)
-            {
-               //Thread.Sleep(100);
-                //MessageBox.Show("derp");
-                bluePieceBox = updatePiecePositionOnGrid(bluePieceBox, CameraCapture.blueGrid);
-                greenPieceBox = updatePiecePositionOnGrid(greenPieceBox, CameraCapture.greenGrid);
-                tealPieceBox = updatePiecePositionOnGrid(tealPieceBox, CameraCapture.tealGrid);
-                bluePieceBox.Refresh();
-                greenPieceBox.Refresh();
-                tealPieceBox.Refresh();
-            }
-            //run();
+            PictureBox box = new PictureBox();
 
-            //MessageBox.Show("box width is: " + CameraCapture.webcamResX + " box height is: " + CameraCapture.webcamResY + "\n"
-            //                + " Second resolution width is: " + Screen.AllScreens[1].Bounds.Width + " and height is: " + Screen.AllScreens[1].Bounds.Height
-            //                + " Reolutions ratio width is: " + screenRatioW + " and height is: " + screenRatioH);
-
+            run();
         }
 
         public void run()
         {
             while (true)
             {
-                Thread.Sleep(1000);
-                //MessageBox.Show("bt.run");
+                SolidBrush myBrush = new SolidBrush(Color.FromArgb(0x12FF0000));
+                Graphics formGraphics = this.CreateGraphics();
+                formGraphics.FillRectangle(myBrush, new Rectangle(200, 100, 200, 300));
+                myBrush.Dispose();
+                formGraphics.Dispose();
+
                 bluePieceBox = updatePiecePositionOnGrid(bluePieceBox, CameraCapture.blueGrid);
                 greenPieceBox = updatePiecePositionOnGrid(greenPieceBox, CameraCapture.greenGrid);
                 tealPieceBox = updatePiecePositionOnGrid(tealPieceBox, CameraCapture.tealGrid);
+                bluePieceBox.Refresh();
+                greenPieceBox.Refresh();
+                tealPieceBox.Refresh();
             }
         }
 

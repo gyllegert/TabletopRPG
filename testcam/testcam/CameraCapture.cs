@@ -105,7 +105,7 @@ namespace testcam
             ImgTeal = FindRange(ImgHsv, 85, 95, 0, 255, 80, 255);
             ImgMagenta = FindRange(ImgHsv, 110, 130, 0, 255, 150, 255);
 
-            int blobAreaMinSize = 400;
+            int blobAreaMinSize = 300;
             int blobAreaMaxSize = 2000;
 
             Rgb blue = new Rgb(0, 0, 255);
