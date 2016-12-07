@@ -114,6 +114,11 @@
     <Content Include="opencv_ffmpeg310_64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\TealF.png" />
+    <None Include="Resources\GreenF.png" />
+    <None Include="Resources\BlueF.png" />
+    <None Include="Resources\Teal.png" />
+    <None Include="Resources\Green.png" />
     <None Include="Resources\Blue.png" />
     <None Include="Resources\GameBoardTemplateWgrid.png" />
     <None Include="Resources\GameBoardTemplate.png" />
