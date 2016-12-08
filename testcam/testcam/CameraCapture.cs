@@ -62,7 +62,7 @@ namespace testcam
                 capture.SetCaptureProperty(CapProp.FrameWidth, webcamResX);
                 capture.SetCaptureProperty(CapProp.FrameHeight, webcamResY);
                 capture.SetCaptureProperty(CapProp.AutoExposure, 0);
-                capture.SetCaptureProperty(CapProp.WhiteBalanceBlueU, 4000);
+                capture.SetCaptureProperty(CapProp.WhiteBalanceBlueU, 4250);
             }
             catch (NullReferenceException excpt)
             {
@@ -88,7 +88,8 @@ namespace testcam
 
                 captureInProgress = !captureInProgress;
             }
-            richTextBox1.AppendText("Width is:" + capture.GetCaptureProperty(CapProp.FrameWidth) + "Height is:" + capture.GetCaptureProperty(CapProp.FrameHeight));
+
+            richTextBox1.AppendText("Width is: " + capture.GetCaptureProperty(CapProp.FrameWidth) + " Height is: " + capture.GetCaptureProperty(CapProp.FrameHeight));
         }
 
         private void ProcessFrame(object sender, EventArgs arg)

@@ -18,7 +18,10 @@ namespace testcam
         float screenRatioH;
 
         GridArea[,] screenGrid = new GridArea[8, 8];
+        List<PictureBox> moveSuggestionPBList = new List<PictureBox>();
+        int moveSuggestionPieceNum = 0;
 
+        List<Point> pieceGridPositions = new List<Point>();
 
         public Battlemat()
         {
@@ -31,7 +34,6 @@ namespace testcam
             WindowState = FormWindowState.Maximized;
             CreateScreenGrid(8, 8);
 
-            PictureBox box = new PictureBox();
 
             run();
         }
@@ -40,18 +42,19 @@ namespace testcam
         {
             while (true)
             {
-                SolidBrush myBrush = new SolidBrush(Color.FromArgb(0x12FF0000));
-                Graphics formGraphics = this.CreateGraphics();
-                formGraphics.FillRectangle(myBrush, new Rectangle(200, 100, 200, 300));
-                myBrush.Dispose();
-                formGraphics.Dispose();
 
-                bluePieceBox = updatePiecePositionOnGrid(bluePieceBox, CameraCapture.blueGrid);
-                greenPieceBox = updatePiecePositionOnGrid(greenPieceBox, CameraCapture.greenGrid);
-                tealPieceBox = updatePiecePositionOnGrid(tealPieceBox, CameraCapture.tealGrid);
+                bluePieceBox = updatePiecePositionOnGrid(bluePieceBox, CameraCapture.blueGrid, 0);
+                greenPieceBox = updatePiecePositionOnGrid(greenPieceBox, CameraCapture.greenGrid, 1);
+                tealPieceBox = updatePiecePositionOnGrid(tealPieceBox, CameraCapture.tealGrid, 2);
+
+                MoveSuggestions(CameraCapture.blueGrid, 0, 2);
+
                 bluePieceBox.Refresh();
                 greenPieceBox.Refresh();
                 tealPieceBox.Refresh();
+
+
+
             }
         }
 
@@ -72,7 +75,7 @@ namespace testcam
             return picBox;
         }
 
-        private PictureBox updatePiecePositionOnGrid(PictureBox picBox, GridArea grid)
+        private PictureBox updatePiecePositionOnGrid(PictureBox picBox, GridArea grid, int pieceNum)
         {
             Point newP = new Point();
 
@@ -81,10 +84,26 @@ namespace testcam
                 if (grid.gridLocation == gridArea.gridLocation)
                 {
                     newP = gridArea.topLeftCoords;
+                    picBox.Location = newP;
+
+                    if (pieceGridPositions.Count < pieceNum + 1)
+                    {
+                        pieceGridPositions.Add(newP);
+                    }
+
+                    if (pieceGridPositions[pieceNum] != newP)
+                    {
+                        pieceGridPositions[pieceNum] = newP;
+
+                        if (moveSuggestionPieceNum == pieceNum)
+                        {
+                            DisposePictureBoxes();
+                        }
+
+                    }
+
                 }
             }
-
-            picBox.Location = newP;
 
             return picBox;
         }
@@ -127,5 +146,101 @@ namespace testcam
                 }
             }
         }
+
+        private void MoveSuggestions(GridArea grid, int pieceNum, int radius)
+        {
+
+            for (int y = -radius; y < radius + 1; y++)
+            {
+                for (int x = -radius; x < radius + 1; x++)
+                {
+                    if(x == 0 && y == 0)
+                    {
+
+                    }
+                    else if (grid.gridLocation.X >= -x && grid.gridLocation.Y >= -y && grid.gridLocation.X < screenGrid.GetLength(0) - x 
+                             && grid.gridLocation.Y < screenGrid.GetLength(1) - y)
+                    {
+                        CreatePictureBox(screenGrid[grid.gridLocation.X + x, grid.gridLocation.Y + y].topLeftCoords, Properties.Resources.Blue);
+                        
+                    }
+
+                }
+            }
+
+
+
+            ////Creating pictureboxes to the left of GamePiece
+            //if (grid.gridLocation.X > 0 + radiusCompensation)
+            //{
+            //    CreatePictureBox(screenGrid[grid.gridLocation.X - radius, grid.gridLocation.Y].topLeftCoords, Properties.Resources.Blue);
+
+            //    if (grid.gridLocation.Y > 0 + radiusCompensation)
+            //    {
+            //        CreatePictureBox(screenGrid[grid.gridLocation.X - radius, grid.gridLocation.Y - radius].topLeftCoords, Properties.Resources.Blue);
+
+            //    }
+
+            //    if (grid.gridLocation.Y < screenGrid.GetLength(1) - radius)
+            //    {
+            //        CreatePictureBox(screenGrid[grid.gridLocation.X - radius, grid.gridLocation.Y + radius].topLeftCoords, Properties.Resources.Blue);
+            //    }
+            //}
+
+            ////Creating pictureboxes to the right of GamePiece
+            //if (grid.gridLocation.X < screenGrid.GetLength(0) - radius)
+            //{
+            //    CreatePictureBox(screenGrid[grid.gridLocation.X + radius, grid.gridLocation.Y].topLeftCoords, Properties.Resources.Blue);
+
+            //    if (grid.gridLocation.Y > 0 + radiusCompensation)
+            //    {
+            //        CreatePictureBox(screenGrid[grid.gridLocation.X + radius, grid.gridLocation.Y - radius].topLeftCoords, Properties.Resources.Blue);
+            //    }
+
+            //    if (grid.gridLocation.Y < screenGrid.GetLength(1) - radius)
+            //    {
+            //        CreatePictureBox(screenGrid[grid.gridLocation.X + radius, grid.gridLocation.Y + radius].topLeftCoords, Properties.Resources.Blue);
+            //    }
+            //}
+
+            ////Creating Pictureboxes on same x location as GamePiece
+            //if (grid.gridLocation.Y > 0 + radiusCompensation)
+            //{
+            //    CreatePictureBox(screenGrid[grid.gridLocation.X, grid.gridLocation.Y - radius].topLeftCoords, Properties.Resources.Blue);
+            //}
+
+            //if (grid.gridLocation.Y < screenGrid.GetLength(1) - radius)
+            //{
+            //    CreatePictureBox(screenGrid[grid.gridLocation.X, grid.gridLocation.Y + radius].topLeftCoords, Properties.Resources.Blue);
+            //}
+
+
+            //Adds the pictureboxes to the form and forces them to be shown
+            foreach (PictureBox pb in moveSuggestionPBList)
+            {
+                this.Controls.Add(pb);
+                pb.Refresh();
+            }
+            moveSuggestionPieceNum = pieceNum;
+        }
+
+        private void DisposePictureBoxes()
+        {
+            foreach (PictureBox pb in moveSuggestionPBList)
+            {
+                this.Controls.Remove(pb);
+                pb.Dispose();
+            }
+        }
+
+        private void CreatePictureBox(Point topLeftCoords, Bitmap image)
+        {
+            PictureBox box = new PictureBox();
+            box.Size = new Size(128, 128);
+            box.Image = image;
+            box.Location = topLeftCoords;
+            moveSuggestionPBList.Add(box);
+        }
+
     }
 }
