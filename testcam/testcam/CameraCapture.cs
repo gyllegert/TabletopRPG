@@ -69,6 +69,7 @@ namespace testcam
         {
             try
             {
+                //Creates the capture and sets the capture properties
                 capture = new Capture();
                 capture.SetCaptureProperty(CapProp.FrameWidth, webcamResX);
                 capture.SetCaptureProperty(CapProp.FrameHeight, webcamResY);
@@ -81,6 +82,7 @@ namespace testcam
                 MessageBox.Show(excpt.Message);
             }
 
+            //Determine the function of the "start" button depending on the state of the capture
             if (capture != null)
             {
                 if (captureInProgress)
@@ -100,32 +102,43 @@ namespace testcam
                 captureInProgress = !captureInProgress;
             }
 
+            //Debugging text, shows webcam resolution
             richTextBox1.AppendText("Width is: " + capture.GetCaptureProperty(CapProp.FrameWidth) + " Height is: " + capture.GetCaptureProperty(CapProp.FrameHeight));
         }
 
         private void ProcessFrame(object sender, EventArgs arg)
         {
+            //Get the latest image from the webcam
             Mat temp = capture.QueryFrame();
+
+            //Convert from mat to Image<>. Mat doesn't contain the functionality needed
             Image<Bgr, Byte> ImageFrame = temp.ToImage<Bgr, byte>();
 
+            //Converting to HSV format
             ImgHsv = ImageFrame.Convert<Hsv, Byte>();
 
+            //Blur the image to reduce noise
             CvInvoke.MedianBlur(ImgHsv, ImgHsv, 9);
 
+            //Creates new images that are thresholding for specific values to find the gamePieces 
             ImgBlue = FindRange(ImgHsv, 100, 110, 100, 255, 80, 255);
             ImgGreen = FindRange(ImgHsv, 30, 50, 0, 255, 80, 255);
             ImgTeal = FindRange(ImgHsv, 85, 95, 0, 255, 80, 255);
             ImgMagenta = FindRange(ImgHsv, 110, 130, 0, 255, 150, 255);
 
+            //initialize the blobArea size variables
             blobAreaMinSize = 300;
             blobAreaMaxSize = 2000;
 
+            //Creates the array of GridAreas that fits the bounding box of the screen
             gridImg = CreateScreenGrid(ImgHsv, 8, 8, black);
 
+            //Finding the gamePieces 
             object[] blueArr = FindGamePiece(ImgBlue, blue, blobAreaMinSize, blobAreaMaxSize, blueGrid);
             object[] greenArr = FindGamePiece(ImgGreen, green, blobAreaMinSize, blobAreaMaxSize, greenGrid);
             object[] tealArr = FindGamePiece(ImgTeal, teal, blobAreaMinSize, blobAreaMaxSize, tealGrid);
 
+            //Putting the objects into their respective variables 
             Image<Rgb, byte> bluePieceImg = (Image<Rgb, byte>)blueArr[0];
             blueGrid = (GridArea)blueArr[1];
             bluePiece = (GamePiece)blueArr[2];
@@ -138,14 +151,15 @@ namespace testcam
             tealGrid = (GridArea)tealArr[1];
             tealPiece = (GamePiece)tealArr[2];
 
+            //Draws a rectangle on the screen grid to show where the gamePieces are
             gridImg = ColorGrid(gridImg, blueGrid, blue);
             gridImg = ColorGrid(gridImg, greenGrid, green);
             gridImg = ColorGrid(gridImg, tealGrid, teal);
 
+            //Shows the images on the CameraCapture form
             captureBoxOrg.Image = ImageFrame;
             captureBoxGreen.Image = greenPieceImg;
             captureBoxTeal.Image = tealPieceImg;
-
             captureBoxBlue.Image = gridImg;
             captureBoxMagenta.Image = bluePieceImg;
         }
@@ -175,9 +189,15 @@ namespace testcam
 
         public Image<Gray, byte> FindValue(Image<Hsv, byte> ImgHsv, int VMin, int VMax)
         {
+            //Thresholds the input image within the gives value range
+
+            //The image is split into its three channels
             Image<Gray, Byte>[] channels = ImgHsv.Split();
+
+            //Value is the last channel in an Hsv image
             Image<Gray, Byte> imgVal = channels[2];
 
+            //Uses the InRange method to threshold within the given value range
             Image<Gray, byte> valfilter = imgVal.InRange(new Gray(VMin), new Gray(VMax));
 
             return valfilter;
@@ -208,17 +228,24 @@ namespace testcam
 
         public object[] FindGamePiece(Image<Gray, byte> imgGray, Rgb rgb, int minBlobArea, int maxBlobArea, GridArea closestGrid)
         {
+
+            //Create a blob detector and a CvBlobs to contain the blobs in
             CvBlobDetector detector = new CvBlobDetector();
             CvBlobs resultingBlobs = new CvBlobs();
 
+            //Detects blobs and puts them in resultingBlobs
             detector.Detect(imgGray, resultingBlobs);
 
+            //Converts from Gray to RGB
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
             Rgb val = rgb;
 
+            //Create variables needed for GamePiece object creation
             Rectangle boundingBox = new Rectangle();
             Point centerCoords = new Point();
 
+            //Goes through all blobs found and if the blob is of the correct size, then its bounding box is drawn on blobImg
+            //and the variables boundingBox and centerCoords get their values from the blob
             foreach (CvBlob targetBlob in resultingBlobs.Values)
             {
                 if (targetBlob.Area > minBlobArea && targetBlob.Area < maxBlobArea)
@@ -229,34 +256,47 @@ namespace testcam
                 }
             }
 
+            //More varaibles for the gamePiece, all based on the boundingBox
             Point topLeft = boundingBox.Location;
             int pieceWidth = boundingBox.Width;
             int pieceHeight = boundingBox.Height;
 
+            //Create the GamePiece object
             GamePiece piece = new GamePiece(centerCoords, topLeft, pieceWidth, pieceHeight);
 
+            //Draw the center of the GamePiece on blobImg
             blobImg.Draw(piece.getCenterRectangle(), val, 2);
 
+            //Gets the gridPosition of the GamePiece on the webcamGrid
             closestGrid = piece.GetGrid(WebcamGrid);
 
-            object[] objArr = new object[] { blobImg, closestGrid, piece};
+            //puts the image, GridArea and GamePiece in an object array
+            object[] objArr = new object[] { blobImg, closestGrid, piece };
 
             return objArr;
         }
 
         public Image<Rgb, byte> CreateScreenGrid(Image<Hsv, byte> ImgHsv, int numGridsX, int numGridsY, Rgb rgb)
         {
+            //Threshold ImgHsv for anything with a value above 199 
+            //Since battlemat background is white no color threshold needed 
             Image<Gray, byte> imgGray = FindValue(ImgHsv, 200, 255);
 
+            //Create a blob detector and a CvBlobs to contain the blobs in
             CvBlobDetector detector = new CvBlobDetector();
             CvBlobs resultingBlobs = new CvBlobs();
 
+            //Detects blobs and puts them in resultingBlobs
             detector.Detect(imgGray, resultingBlobs);
 
+            //Converts from Gray to RGB
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
 
+            //Create variable needed for creation of the GradArea array
             Rectangle boundingBox = new Rectangle();
 
+            //Goes through all blobs to find the blob for the screen and if the blob is of the correct size, then its bounding box is drawn on blobImg
+            //and the variable boundingBox gets its value from the blob
             foreach (CvBlob targetBlob in resultingBlobs.Values)
             {
                 if (targetBlob.Area > 100000)
@@ -266,6 +306,7 @@ namespace testcam
                 }
             }
 
+            //Define variables needed for GridArea creation
             Point topLeft = boundingBox.Location;
             boxWidth = boundingBox.Width;
             boxHeight = boundingBox.Height;
@@ -273,17 +314,25 @@ namespace testcam
             int gridWidth = boxWidth / numGridsX;
             int gridHeight = boxHeight / numGridsY;
 
+            //Creates the GridAreas and puts them in the WebcamGrid array
             for (int y = 0; y < numGridsY; y++)
             {
                 for (int x = 0; x < numGridsX; x++)
                 {
+                    //Create the top left coordinates for the GridArea, based on the loop control variables 
+                    //and the bounding box of the screen
                     Point tempPoint = topLeft;
                     tempPoint.X = tempPoint.X + (gridWidth * x);
                     tempPoint.Y = tempPoint.Y + (gridHeight * y);
 
+                    //The gridLocation is the same as the same as the GridAreas position in the array
                     Point gridLocation = new Point(x, y);
 
+                    //Creates the GridAreas
                     WebcamGrid[x, y] = new GridArea(tempPoint, gridLocation, gridWidth, gridHeight, rgb);
+
+                    //Draws rectangles of the GridAreas on blobImg, as a visual aid when debugging
+                    //The center of the GridAreas are also drawn. Also to help with debugging and functionality testing
                     blobImg = ColorGrid(blobImg, WebcamGrid[x, y], rgb);
                     blobImg.Draw(WebcamGrid[x, y].getCenterRectangle(), rgb, 2);
                 }
@@ -293,6 +342,8 @@ namespace testcam
 
         public Image<Rgb, byte> ColorGrid(Image<Rgb, byte> imgRGB, GridArea grid, Rgb rgb)
         {
+            //Uses the Image<>.Draw method to draw a rectangle on the given GridArea
+            //using the given Rgb color
             imgRGB.Draw(grid.getRectangle(), rgb, 2);
             return imgRGB;
         }
@@ -352,22 +403,26 @@ namespace testcam
 
         private void Start_Battlemat_Click(object sender, EventArgs e)
         {
+            //Creates a new thred to handle the Battlemat form
             ThreadStart ts = new ThreadStart(startBattlemat);
             Thread thread = new Thread(ts);
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
-            
+
         }
 
         private void startBattlemat()
         {
+            //Create the Battlematform
             Battlemat bt = new Battlemat();
+            //Get the array of screens in the system
             Screen[] screens = Screen.AllScreens;
+            
+            //Puts the form on the second screen
             Rectangle location = screens[1].Bounds;
             bt.StartPosition = FormStartPosition.Manual;
-            bt.SetBounds(location.X, location.Y, 1024, 1024);
+            bt.SetBounds(location.X, location.Y, 1280, 1024);
             bt.Show();
-            //bt.run();
         }
     }
 }
