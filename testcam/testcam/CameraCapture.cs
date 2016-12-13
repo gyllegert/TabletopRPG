@@ -18,14 +18,42 @@ namespace testcam
 {
     public partial class CameraCapture : Form
     {
+        #region Decalaring global variables
+
         Capture capture = null;
         bool captureInProgress;
+
+        public static int webcamResX = 640;
+        public static int webcamResY = 480;
 
         Image<Hsv, Byte> ImgHsv;
         Image<Gray, Byte> ImgBlue;
         Image<Gray, Byte> ImgGreen;
         Image<Gray, Byte> ImgTeal;
         Image<Gray, Byte> ImgMagenta;
+
+        Image<Rgb, byte> gridImg = null;
+
+        GridArea[,] WebcamGrid = new GridArea[8, 8];
+        public static GridArea blueGrid = null;
+        public static GridArea tealGrid = null;
+        public static GridArea greenGrid = null;
+
+        public static GamePiece bluePiece = null;
+        public static GamePiece tealPiece = null;
+        public static GamePiece greenPiece = null;
+
+        public static int boxWidth;
+        public static int boxHeight;
+
+        Rgb blue = new Rgb(0, 0, 255);
+        Rgb teal = new Rgb(0, 255, 255);
+        Rgb white = new Rgb(255, 255, 225);
+        Rgb black = new Rgb(0, 0, 0);
+        Rgb green = new Rgb(0, 255, 0);
+
+        int blobAreaMinSize, blobAreaMaxSize;
+        #endregion
 
         public CameraCapture()
         {
@@ -42,10 +70,10 @@ namespace testcam
             try
             {
                 capture = new Capture();
-                capture.SetCaptureProperty(CapProp.FrameWidth, 640);
-                capture.SetCaptureProperty(CapProp.FrameHeight, 480);
+                capture.SetCaptureProperty(CapProp.FrameWidth, webcamResX);
+                capture.SetCaptureProperty(CapProp.FrameHeight, webcamResY);
                 capture.SetCaptureProperty(CapProp.AutoExposure, 0);
-                //capture.SetCaptureProperty(CapProp.Exposure, 0.1);
+                capture.SetCaptureProperty(CapProp.WhiteBalanceBlueU, 4250);
             }
             catch (NullReferenceException excpt)
             {
@@ -71,7 +99,8 @@ namespace testcam
 
                 captureInProgress = !captureInProgress;
             }
-            richTextBox1.AppendText("Width is:" + capture.GetCaptureProperty(CapProp.FrameWidth) + "Height is:" + capture.GetCaptureProperty(CapProp.FrameHeight));
+
+            richTextBox1.AppendText("Width is: " + capture.GetCaptureProperty(CapProp.FrameWidth) + " Height is: " + capture.GetCaptureProperty(CapProp.FrameHeight));
         }
 
         private void ProcessFrame(object sender, EventArgs arg)
@@ -83,24 +112,42 @@ namespace testcam
 
             CvInvoke.MedianBlur(ImgHsv, ImgHsv, 9);
 
-            ImgBlue = FindRange(ImgHsv, 95, 105, 100, 255, 80, 255);
-            ImgGreen = FindRange(ImgHsv, 60, 80, 0, 255, 150, 255);
-            ImgTeal = FindRange(ImgHsv, 80, 90, 0, 255, 150, 255);
+            ImgBlue = FindRange(ImgHsv, 100, 110, 100, 255, 80, 255);
+            ImgGreen = FindRange(ImgHsv, 30, 50, 0, 255, 80, 255);
+            ImgTeal = FindRange(ImgHsv, 85, 95, 0, 255, 80, 255);
             ImgMagenta = FindRange(ImgHsv, 110, 130, 0, 255, 150, 255);
 
-            int blobAreaMinSize = 500;
-            int blobAreaMaxSize = 2000;
+            blobAreaMinSize = 300;
+            blobAreaMaxSize = 2000;
+
+            gridImg = CreateScreenGrid(ImgHsv, 8, 8, black);
+
+            object[] blueArr = FindGamePiece(ImgBlue, blue, blobAreaMinSize, blobAreaMaxSize, blueGrid);
+            object[] greenArr = FindGamePiece(ImgGreen, green, blobAreaMinSize, blobAreaMaxSize, greenGrid);
+            object[] tealArr = FindGamePiece(ImgTeal, teal, blobAreaMinSize, blobAreaMaxSize, tealGrid);
+
+            Image<Rgb, byte> bluePieceImg = (Image<Rgb, byte>)blueArr[0];
+            blueGrid = (GridArea)blueArr[1];
+            bluePiece = (GamePiece)blueArr[2];
+
+            Image<Rgb, byte> greenPieceImg = (Image<Rgb, byte>)greenArr[0];
+            greenGrid = (GridArea)greenArr[1];
+            greenPiece = (GamePiece)greenArr[2];
+
+            Image<Rgb, byte> tealPieceImg = (Image<Rgb, byte>)tealArr[0];
+            tealGrid = (GridArea)tealArr[1];
+            tealPiece = (GamePiece)tealArr[2];
+
+            gridImg = ColorGrid(gridImg, blueGrid, blue);
+            gridImg = ColorGrid(gridImg, greenGrid, green);
+            gridImg = ColorGrid(gridImg, tealGrid, teal);
 
             captureBoxOrg.Image = ImageFrame;
-            //captureBoxBlue.Image = FindBlobs(ImgBlue, 0, 0, 255, blobAreaMinSize);
-            captureBoxGreen.Image = FindBlobs(ImgGreen, 0, 255, 0, blobAreaMinSize);
-            captureBoxTeal.Image = FindBlobs(ImgTeal, 0, 255, 255, blobAreaMinSize);
-            //captureBoxMagenta.Image = FindBlobs(ImgMagenta, 255, 0, 255, blobAreaMinSize);
+            captureBoxGreen.Image = greenPieceImg;
+            captureBoxTeal.Image = tealPieceImg;
 
-            captureBoxMagenta.Image = FindGamePiece(ImgBlue, 0, 0, 255, blobAreaMinSize, blobAreaMaxSize);
-
-            captureBoxBlue.Image = CreateScreenGrid(ImgHsv, 8, 8);
-
+            captureBoxBlue.Image = gridImg;
+            captureBoxMagenta.Image = bluePieceImg;
         }
 
         public Image<Gray, byte> FindRange(Image<Hsv, byte> ImgHsv, int HMin, int HMax, int VMin, int VMax, int SMin, int SMax)
@@ -137,7 +184,7 @@ namespace testcam
 
         }
 
-        public Image<Rgb, byte> FindBlobs(Image<Gray, byte> imgGray, int r, int g, int b, int minBlobArea)
+        public Image<Rgb, byte> FindBlobs(Image<Gray, byte> imgGray, Rgb rgb, int minBlobArea)
         {
 
             CvBlobDetector detector = new CvBlobDetector();
@@ -146,7 +193,7 @@ namespace testcam
             uint numBlobsFound = detector.Detect(imgGray, resultingBlobs);
 
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
-            Rgb val = new Rgb(r, g, b);
+            Rgb val = rgb;
 
             foreach (CvBlob targetBlob in resultingBlobs.Values)
             {
@@ -159,17 +206,15 @@ namespace testcam
             return blobImg;
         }
 
-        public Image<Rgb, byte> FindGamePiece(Image<Gray, byte> imgGray, int r, int g, int b, int minBlobArea, int maxBlobArea)
+        public object[] FindGamePiece(Image<Gray, byte> imgGray, Rgb rgb, int minBlobArea, int maxBlobArea, GridArea closestGrid)
         {
-
-
             CvBlobDetector detector = new CvBlobDetector();
             CvBlobs resultingBlobs = new CvBlobs();
 
-            uint numBlobsFound = detector.Detect(imgGray, resultingBlobs);
+            detector.Detect(imgGray, resultingBlobs);
 
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
-            Rgb val = new Rgb(r, g, b);
+            Rgb val = rgb;
 
             Rectangle boundingBox = new Rectangle();
             Point centerCoords = new Point();
@@ -178,11 +223,9 @@ namespace testcam
             {
                 if (targetBlob.Area > minBlobArea && targetBlob.Area < maxBlobArea)
                 {
-                    
                     blobImg.Draw(targetBlob.BoundingBox, val, 1);
                     boundingBox = targetBlob.BoundingBox;
                     centerCoords = Point.Round(targetBlob.Centroid);
-
                 }
             }
 
@@ -194,45 +237,41 @@ namespace testcam
 
             blobImg.Draw(piece.getCenterRectangle(), val, 2);
 
+            closestGrid = piece.GetGrid(WebcamGrid);
 
-            return blobImg;
+            object[] objArr = new object[] { blobImg, closestGrid, piece};
+
+            return objArr;
         }
 
-        public Image<Rgb, byte> CreateScreenGrid(Image<Hsv, byte> ImgHsv, int numGridsX, int numGridsY)
+        public Image<Rgb, byte> CreateScreenGrid(Image<Hsv, byte> ImgHsv, int numGridsX, int numGridsY, Rgb rgb)
         {
-
             Image<Gray, byte> imgGray = FindValue(ImgHsv, 200, 255);
 
             CvBlobDetector detector = new CvBlobDetector();
             CvBlobs resultingBlobs = new CvBlobs();
 
-            uint numBlobsFound = detector.Detect(imgGray, resultingBlobs);
+            detector.Detect(imgGray, resultingBlobs);
 
             Image<Rgb, byte> blobImg = imgGray.Convert<Rgb, byte>();
-            Rgb val = new Rgb(255, 255, 255);
 
             Rectangle boundingBox = new Rectangle();
 
             foreach (CvBlob targetBlob in resultingBlobs.Values)
             {
-                if (targetBlob.Area > 1000)
+                if (targetBlob.Area > 100000)
                 {
-                    blobImg.Draw(targetBlob.BoundingBox, val, 3);
+                    blobImg.Draw(targetBlob.BoundingBox, new Rgb(255, 255, 255), 3);
                     boundingBox = targetBlob.BoundingBox;
                 }
-               
             }
 
             Point topLeft = boundingBox.Location;
-            int boxWidth = boundingBox.Width;
-            int boxHeight = boundingBox.Height;
+            boxWidth = boundingBox.Width;
+            boxHeight = boundingBox.Height;
 
             int gridWidth = boxWidth / numGridsX;
             int gridHeight = boxHeight / numGridsY;
-
-            GridArea[,] WebcamGrid = new GridArea[8, 8];
-
-            Rgb gridRGB = new Rgb(0, 0, 0);
 
             for (int y = 0; y < numGridsY; y++)
             {
@@ -244,12 +283,18 @@ namespace testcam
 
                     Point gridLocation = new Point(x, y);
 
-                    WebcamGrid[x, y] = new GridArea(tempPoint, gridLocation, gridWidth, gridHeight);
-                    blobImg.Draw(WebcamGrid[x, y].getRectangle(), gridRGB, 2);
+                    WebcamGrid[x, y] = new GridArea(tempPoint, gridLocation, gridWidth, gridHeight, rgb);
+                    blobImg = ColorGrid(blobImg, WebcamGrid[x, y], rgb);
+                    blobImg.Draw(WebcamGrid[x, y].getCenterRectangle(), rgb, 2);
                 }
             }
-
             return blobImg;
+        }
+
+        public Image<Rgb, byte> ColorGrid(Image<Rgb, byte> imgRGB, GridArea grid, Rgb rgb)
+        {
+            imgRGB.Draw(grid.getRectangle(), rgb, 2);
+            return imgRGB;
         }
 
         public Image<Hsv, byte> FindColor(Image<Hsv, byte> ImgHsv, int HMin, int HMax, int saturation, int value)
@@ -305,5 +350,24 @@ namespace testcam
                 capture.Dispose();
         }
 
+        private void Start_Battlemat_Click(object sender, EventArgs e)
+        {
+            ThreadStart ts = new ThreadStart(startBattlemat);
+            Thread thread = new Thread(ts);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            
+        }
+
+        private void startBattlemat()
+        {
+            Battlemat bt = new Battlemat();
+            Screen[] screens = Screen.AllScreens;
+            Rectangle location = screens[1].Bounds;
+            bt.StartPosition = FormStartPosition.Manual;
+            bt.SetBounds(location.X, location.Y, 1024, 1024);
+            bt.Show();
+            //bt.run();
+        }
     }
 }

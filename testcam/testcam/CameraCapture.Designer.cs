@@ -36,6 +36,7 @@
             this.captureBoxGreen = new Emgu.CV.UI.ImageBox();
             this.captureBoxTeal = new Emgu.CV.UI.ImageBox();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.Start_Battlemat = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.captureBoxOrg)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.captureBoxBlue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.captureBoxMagenta)).BeginInit();
@@ -74,27 +75,27 @@
             // captureBoxMagenta
             // 
             this.captureBoxMagenta.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxMagenta.Location = new System.Drawing.Point(542, 514);
+            this.captureBoxMagenta.Location = new System.Drawing.Point(658, 508);
             this.captureBoxMagenta.Name = "captureBoxMagenta";
-            this.captureBoxMagenta.Size = new System.Drawing.Size(512, 384);
+            this.captureBoxMagenta.Size = new System.Drawing.Size(640, 480);
             this.captureBoxMagenta.TabIndex = 5;
             this.captureBoxMagenta.TabStop = false;
             // 
             // captureBoxGreen
             // 
             this.captureBoxGreen.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxGreen.Location = new System.Drawing.Point(24, 514);
+            this.captureBoxGreen.Location = new System.Drawing.Point(3, 508);
             this.captureBoxGreen.Name = "captureBoxGreen";
-            this.captureBoxGreen.Size = new System.Drawing.Size(512, 384);
+            this.captureBoxGreen.Size = new System.Drawing.Size(640, 480);
             this.captureBoxGreen.TabIndex = 6;
             this.captureBoxGreen.TabStop = false;
             // 
             // captureBoxTeal
             // 
             this.captureBoxTeal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.captureBoxTeal.Location = new System.Drawing.Point(1072, 514);
+            this.captureBoxTeal.Location = new System.Drawing.Point(1304, 508);
             this.captureBoxTeal.Name = "captureBoxTeal";
-            this.captureBoxTeal.Size = new System.Drawing.Size(512, 384);
+            this.captureBoxTeal.Size = new System.Drawing.Size(600, 480);
             this.captureBoxTeal.TabIndex = 7;
             this.captureBoxTeal.TabStop = false;
             // 
@@ -106,11 +107,22 @@
             this.richTextBox1.TabIndex = 8;
             this.richTextBox1.Text = "";
             // 
+            // Start_Battlemat
+            // 
+            this.Start_Battlemat.Location = new System.Drawing.Point(1511, 23);
+            this.Start_Battlemat.Name = "Start_Battlemat";
+            this.Start_Battlemat.Size = new System.Drawing.Size(96, 23);
+            this.Start_Battlemat.TabIndex = 9;
+            this.Start_Battlemat.Text = "Start Battlemat";
+            this.Start_Battlemat.UseVisualStyleBackColor = true;
+            this.Start_Battlemat.Click += new System.EventHandler(this.Start_Battlemat_Click);
+            // 
             // CameraCapture
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1584, 985);
+            this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.Controls.Add(this.Start_Battlemat);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.captureBoxTeal);
             this.Controls.Add(this.captureBoxGreen);
@@ -139,6 +151,7 @@
         private Emgu.CV.UI.ImageBox captureBoxGreen;
         private Emgu.CV.UI.ImageBox captureBoxTeal;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Button Start_Battlemat;
     }
 }
 
