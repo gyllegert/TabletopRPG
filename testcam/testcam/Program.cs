@@ -25,11 +25,17 @@ namespace testcam
 
     public class GridArea
     {
+        #region Class variables
         public Point gridLocation = new Point();
         public Point centerCoords = new Point();
         public Point topLeftCoords = new Point();
         public int width, height;
         public Rgb color = new Rgb(255, 255, 255);
+        public bool enemyOnGrid = false;
+
+        #endregion
+
+        #region Constructors
 
         public GridArea(Point topLeftCoords, Point gridLocation, int width, int height)
         {
@@ -56,6 +62,7 @@ namespace testcam
 
             this.color = color;
         }
+        #endregion
 
         public Rectangle getRectangle()
         {
@@ -74,9 +81,25 @@ namespace testcam
 
     public class GamePiece
     {
+        #region Class variables
+
         public Point centerCoords = new Point();
         public Point topLeftCoords = new Point();
         public int width, height;
+        public int speed = 2;
+        public int initiative = 5;
+
+        #endregion
+
+        #region Constructors
+
+        public GamePiece()
+        {
+            centerCoords = new Point(0, 0);
+            topLeftCoords = new Point(0, 0);
+            width = 0;
+            height = 0;
+        }
 
         public GamePiece(Point centerCoords, Point topLeftCoords, int width, int height)
         {
@@ -85,6 +108,26 @@ namespace testcam
             this.width = width;
             this.height = height;
         }
+
+        public GamePiece(Point centerCoords, Point topLeftCoords, int width, int height, int speed)
+        {
+            this.centerCoords = centerCoords;
+            this.topLeftCoords = topLeftCoords;
+            this.width = width;
+            this.height = height;
+            this.speed = speed / 5;
+        }
+
+        public GamePiece(Point centerCoords, Point topLeftCoords, int width, int height, int speed, int initiative)
+        {
+            this.centerCoords = centerCoords;
+            this.topLeftCoords = topLeftCoords;
+            this.width = width;
+            this.height = height;
+            this.speed = speed / 5;
+            this.initiative = initiative;
+        }
+        #endregion
 
         public Rectangle getRectangle()
         {
@@ -129,6 +172,29 @@ namespace testcam
             }
             return gridArea;
         }
+    }
+
+    public class Enemy : GamePiece
+    {
+
+        int size;
+
+        public Enemy()
+        {
+
+        }
+
+        public Enemy(Point centerCoords, Point topLeftCoords, int width, int height, int size)
+        {
+            this.centerCoords = centerCoords;
+            this.topLeftCoords = topLeftCoords;
+            this.width = width;
+            this.height = height;
+            this.size = size;
+        }
+
+
+
     }
 }
 

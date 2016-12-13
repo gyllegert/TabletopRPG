@@ -39,9 +39,20 @@ namespace testcam
         public static GridArea tealGrid = null;
         public static GridArea greenGrid = null;
 
+        public static GamePiece bluePiece = null;
+        public static GamePiece tealPiece = null;
+        public static GamePiece greenPiece = null;
+
         public static int boxWidth;
         public static int boxHeight;
 
+        Rgb blue = new Rgb(0, 0, 255);
+        Rgb teal = new Rgb(0, 255, 255);
+        Rgb white = new Rgb(255, 255, 225);
+        Rgb black = new Rgb(0, 0, 0);
+        Rgb green = new Rgb(0, 255, 0);
+
+        int blobAreaMinSize, blobAreaMaxSize;
         #endregion
 
         public CameraCapture()
@@ -106,39 +117,34 @@ namespace testcam
             ImgTeal = FindRange(ImgHsv, 85, 95, 0, 255, 80, 255);
             ImgMagenta = FindRange(ImgHsv, 110, 130, 0, 255, 150, 255);
 
-            int blobAreaMinSize = 300;
-            int blobAreaMaxSize = 2000;
-
-            Rgb blue = new Rgb(0, 0, 255);
-            Rgb teal = new Rgb(0, 255, 255);
-            Rgb white = new Rgb(255, 255, 225);
-            Rgb black = new Rgb(0, 0, 0);
-            Rgb green = new Rgb(0, 255, 0);
+            blobAreaMinSize = 300;
+            blobAreaMaxSize = 2000;
 
             gridImg = CreateScreenGrid(ImgHsv, 8, 8, black);
 
-            object[] objArr = FindGamePiece(ImgBlue, blue, blobAreaMinSize, blobAreaMaxSize, blueGrid);
+            object[] blueArr = FindGamePiece(ImgBlue, blue, blobAreaMinSize, blobAreaMaxSize, blueGrid);
             object[] greenArr = FindGamePiece(ImgGreen, green, blobAreaMinSize, blobAreaMaxSize, greenGrid);
             object[] tealArr = FindGamePiece(ImgTeal, teal, blobAreaMinSize, blobAreaMaxSize, tealGrid);
 
-            Image<Rgb, byte> bluePieceImg = (Image<Rgb, byte>)objArr[0];
-            blueGrid = (GridArea)objArr[1];
+            Image<Rgb, byte> bluePieceImg = (Image<Rgb, byte>)blueArr[0];
+            blueGrid = (GridArea)blueArr[1];
+            bluePiece = (GamePiece)blueArr[2];
 
             Image<Rgb, byte> greenPieceImg = (Image<Rgb, byte>)greenArr[0];
             greenGrid = (GridArea)greenArr[1];
+            greenPiece = (GamePiece)greenArr[2];
 
             Image<Rgb, byte> tealPieceImg = (Image<Rgb, byte>)tealArr[0];
             tealGrid = (GridArea)tealArr[1];
+            tealPiece = (GamePiece)tealArr[2];
 
             gridImg = ColorGrid(gridImg, blueGrid, blue);
             gridImg = ColorGrid(gridImg, greenGrid, green);
             gridImg = ColorGrid(gridImg, tealGrid, teal);
 
             captureBoxOrg.Image = ImageFrame;
-            //captureBoxBlue.Image = FindBlobs(ImgBlue, 0, 0, 255, blobAreaMinSize);
             captureBoxGreen.Image = greenPieceImg;
             captureBoxTeal.Image = tealPieceImg;
-            //captureBoxMagenta.Image = FindBlobs(ImgMagenta, 255, 0, 255, blobAreaMinSize);
 
             captureBoxBlue.Image = gridImg;
             captureBoxMagenta.Image = bluePieceImg;
@@ -233,7 +239,7 @@ namespace testcam
 
             closestGrid = piece.GetGrid(WebcamGrid);
 
-            object[] objArr = new object[] { blobImg, closestGrid };
+            object[] objArr = new object[] { blobImg, closestGrid, piece};
 
             return objArr;
         }
